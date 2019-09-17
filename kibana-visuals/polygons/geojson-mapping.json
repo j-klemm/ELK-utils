@@ -1,0 +1,45 @@
+{
+  "properties": {
+    "point": {
+      "type": "geo_point"
+    },
+    "doctype" : {
+      "type" : "text",
+      "fields" : {
+        "keyword" : {
+          "type" : "keyword",
+          "ignore_above" : 256
+        }
+      }
+    },
+    "perimeter": {
+      "properties": {
+        "geometry": {
+          "properties": {
+            "coordinates": {
+              "type": "float"
+            },
+            "type": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            }
+          }
+        },
+        "type": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}

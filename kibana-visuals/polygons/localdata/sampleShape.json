@@ -1,0 +1,11 @@
+{
+ "point":{
+   "lon": 0,
+   "lat": 0
+ },
+  "geojson_data": {
+    "geometry": [[[-10,10],[10,10],[-10,10],[-10,-10],[-10,10]]],
+    "type": "Feature"
+    },
+  "doctype": "geojson"
+}

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "config": {"kibana": {"type": "map"}},
+  "width": 200,
+  "height": 200,
+  "data": [
+    { //Dataset for outershape polygons
+      "name": "perimeters",
+      "url": {
+        "%context%": true,
+        "index": "geodata*",
+        "body": {
+          "_source": [
+            "geojson_data",
+            "doctype"
+          ]
+        },
+        "size": 1000
+      },
+      "format": { //Reduce nesting
+        "type": "json",
+        "property": "hits.hits"
+      },
+      "transform": [
+        { //Some data is returned null so filter it out
+          "type": "filter",
+          "expr": "datum._source.doctype == 'geojson'"
+        },
+        { //Some data is returned null so filter it out
+          "type": "filter",
+          "expr": "datum._source.geojson_data != null"
+        },
+        { //Un-nest fields to fit geojson
+          "type": "project",
+          "fields": [
+            "_source",
+            "_source.geojson_data.geometry",
+            "_source.geojson_data.type"
+          ],
+          "as": [
+            "properties",
+            "geometry",
+            "type"
+          ]
+        }
+      ]
+    },
+    { //Points dataset that will be represented as diamonds
+      "name": "points",
+      "url": {
+        "%context%": true,
+        "index": "geodata*",
+        "body": {
+          "_source": ["point", "doctype"]
+        },
+        "size": 1000
+      },
+      "format": {"property": "hits.hits"},
+      "transform": [
+        { //Filter out null data
+          "type": "filter",
+          "expr": "datum._source.doctype == 'geojson'"
+        },
+        {
+          "type": "geopoint",
+          "projection": "projection",
+          "fields": [
+            "_source.point.lon",
+            "_source.point.lat"
+          ]
+        },
+        {
+          "type": "project",
+          "fields": [
+            "_source.point.lon",
+            "_source.point.lat",
+            "_source",
+            "x",
+            "y"
+          ],
+          "as": [
+            "lon",
+            "lat",
+            "_source",
+            "x",
+            "y"
+          ]
+        }
+      ]
+    }
+  ],
+  "marks": [
+    { //Display perimeters
+      "type": "shape",
+      "from": {"data": "perimeters"},
+      "encode": {
+        "update": {
+          "fill": {"value": "coral"},
+          "stroke": {"value": "black"},
+          "strokeWidth": {"value": 2},
+          "fillOpacity": {"value": 0.3}
+        }
+      },
+      "transform": [
+        {
+          "type": "geoshape",
+          "projection": "projection"
+        }
+      ]
+    },
+    { //Display points as diamonds
+      "type": "symbol",
+      "from": {"data": "points"},
+      "encode": {
+        "enter": {
+          "size": {"value": 40},
+          "fill": [ //Choose color based on condition
+            {"test": "datum.lon < 0", "value": "red"},
+            {"value": "steelblue"} //Default if test not satisfied
+          ],
+          "stroke": {"value": "black"},
+          "shape": {"value": "cross"},
+          "tooltip": [
+            { //Hover tool
+              "signal": "{title:'point','lat': datum.lat, 'lon':datum.lon }"
+            }
+          ]
+        },
+        "update": {
+          "x": {"field": "x"},
+          "y": {"field": "y"}
+        }
+      }
+    }
+  ]
+}
