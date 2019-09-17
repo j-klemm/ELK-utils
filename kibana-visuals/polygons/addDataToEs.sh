@@ -1,7 +1,6 @@
 #!/bin/bash
 #AUTHOR: J.KLEMM
-#Run this script locally to copy data onto ES cluster running in AWS, or if data is local then run
-#postNewData.sh.
+#Run this script locally to copy data onto ES cluster running in AWS. f data is local then run postNewData.sh.
 
 remoteDataDir=~/kib-vis/data #CHANGE ME TO GRAB DATA FROM A DIFFERENT REMOTE DIR
 localDataDir=./localdata  #CHANGE ME TO COPY DATA FROM DIFFERENT LOCAL DIR
